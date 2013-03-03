@@ -1,0 +1,92 @@
+#!/usr/bin/env node
+
+var jesus = require("..");
+
+var log = function(level, summary, info) {
+  console.log(JSON.stringify([(new Date()).toISOString(), level.toUpperCase(), summary, info]));
+};
+
+["debug", "info", "warning", "error"].forEach(function(level) {
+  log[level] = log.bind(null, level);
+});
+
+if (process.argv[2] === "listen") {
+  var server = jesus.createServer().listen();
+
+  server.on("clientConnected", function() {
+    log.info("client connected");
+  });
+
+  server.on("clientDisconnected", function() {
+    log.info("client disconnected");
+  });
+
+  ["processStarted", "processExited", "processError"].forEach(function(event) {
+    server.jesus.on(event, function(info) {
+      log.info(event.replace(/([a-z])([A-Z])/, "$1 $2").toLowerCase(), info);
+    });
+  });
+}
+
+if (process.argv[2] === "start") {
+  jesus.connect().call("start", process.argv.slice(4), {
+    id: process.argv[3],
+    cwd: process.cwd(),
+  }, function(err, info) {
+    dump_processes([info]);
+  });
+}
+
+if (process.argv[2] === "stop") {
+  jesus.connect().call("stop", process.argv[3], function(err, info) {
+    dump_processes([info]);
+  });
+}
+
+if (process.argv[2] === "restart") {
+  jesus.connect().call("restart", function(err, info) {
+    dump_processes([info]);
+  });
+}
+
+if (process.argv[2] === "restartall") {
+  jesus.connect().call("restartAll", function(err, list) {
+    dump_processes(list);
+  });
+}
+
+if (process.argv[2] === "list") {
+  jesus.connect().call("list", function(err, list) {
+    dump_processes(list);
+  });
+}
+
+function dump_processes(list) {
+  var pad = function pad(text, length) {
+    return text + (new Array((length - text.toString().length) + 1)).join(" ");
+  };
+
+  var id_width           = 2,
+      pid_width          = 3,
+      restarts_width     = 8,
+      last_started_width = 12,
+      command_width      = 7;
+
+  list.forEach(function(entry) {
+    id_width           = Math.max(entry.id.length,                              id_width);
+    pid_width          = Math.max(entry.pid.toString(10).length,                pid_width);
+    restarts_width     = Math.max(entry.started.length.toString(10).length,     restarts_width);
+    last_started_width = Math.max(entry.started[entry.started.length-1].length, last_started_width);
+    command_width      = Math.max(entry.args.join(" ").length,                  command_width);
+  });
+
+  console.log((new Array(id_width + pid_width + restarts_width + last_started_width + command_width + 19)).join("-"));
+  console.log(["", pad("ID", id_width), pad("PID", pid_width), pad("Restarts", restarts_width), pad("Last Started", last_started_width), pad("Command", command_width), ""].join(" | "));
+  console.log((new Array(id_width + pid_width + restarts_width + last_started_width + command_width + 19)).join("-"));
+  list.forEach(function(entry) {
+    console.log(["", pad(entry.id, id_width), pad(entry.pid, pid_width), pad(entry.started.length, restarts_width), pad(entry.started[entry.started.length-1], last_started_width), pad(entry.args.join(" "), command_width), ""].join(" | "));
+  });
+  console.log((new Array(id_width + pid_width + restarts_width + last_started_width + command_width + 19)).join("-"));
+
+  process.exit(0);
+}

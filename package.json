@@ -1,0 +1,25 @@
+{
+  "name": "jesus",
+  "version": "0.0.0",
+  "description": "Resurrect processes if they die",
+  "main": "index.js",
+  "dependencies": {
+    "burro": "~0.4.3",
+    "pillion": "~0.0.2"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/deoxxa/jesus.git"
+  },
+  "keywords": [
+    "process",
+    "management",
+    "restart",
+    "run",
+    "monitor"
+  ],
+  "author": "Conrad Pankoff <deoxxa@fknsrs.biz> (http://www.fknsrs.biz/)",
+  "license": "BSD",
+  "readmeFilename": "README.md"
+}
