@@ -58,7 +58,7 @@ if (process.argv[2] === "listen") {
 }
 
 if (process.argv[2] === "start") {
-  jesus.connect().call("start", process.argv.slice(4), {
+  jesus.connect().callRemote("start", process.argv.slice(4), {
     id: process.argv[3],
     cwd: process.cwd(),
   }, function(err, info) {
@@ -71,7 +71,7 @@ if (process.argv[2] === "start") {
 }
 
 if (process.argv[2] === "stop") {
-  jesus.connect().call("stop", process.argv[3], function(err, info) {
+  jesus.connect().callRemote("stop", process.argv[3], function(err, info) {
     if (err) {
       dump_error(err);
     }
@@ -81,7 +81,7 @@ if (process.argv[2] === "stop") {
 }
 
 if (process.argv[2] === "restart") {
-  jesus.connect().call("restart", process.argv[3], function(err, info) {
+  jesus.connect().callRemote("restart", process.argv[3], function(err, info) {
     if (err) {
       dump_error(err);
     }
@@ -91,7 +91,7 @@ if (process.argv[2] === "restart") {
 }
 
 if (process.argv[2] === "check") {
-  jesus.connect().call("check", process.argv[3], function(err, info) {
+  jesus.connect().callRemote("check", process.argv[3], function(err, info) {
     if (err) {
       dump_error(err);
     }
@@ -101,7 +101,7 @@ if (process.argv[2] === "check") {
 }
 
 if (process.argv[2] === "restartall") {
-  jesus.connect().call("restartAll", function(err, list) {
+  jesus.connect().callRemote("restartAll", function(err, list) {
     if (err) {
       dump_error(err);
     }
@@ -111,7 +111,7 @@ if (process.argv[2] === "restartall") {
 }
 
 if (process.argv[2] === "list") {
-  jesus.connect().call("list", function(err, list) {
+  jesus.connect().callRemote("list", function(err, list) {
     if (err) {
       dump_error(err);
     }
