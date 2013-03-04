@@ -2,16 +2,30 @@
 
 var jesus = require("..");
 
+var logStream = process.stdout;
+
 var log = function(level, summary, info) {
-  console.log(JSON.stringify([(new Date()).toISOString(), level.toUpperCase(), summary, info]));
+  logStream.write(JSON.stringify([(new Date()).toISOString(), level.toUpperCase(), summary, info]) + "\n");
 };
 
 ["debug", "info", "warning", "error"].forEach(function(level) {
   log[level] = log.bind(null, level);
 });
 
+if (process.argv[2] === "daemon") {
+  require("child_process").spawn("node", [process.argv[1], "listen"].concat(process.argv.slice(3)), {
+    detached: true,
+    cwd: process.cwd(),
+    stdio: "ignore",
+  }).unref();
+}
+
 if (process.argv[2] === "listen") {
   var server = jesus.createServer().listen();
+
+  if (process.argv[3]) {
+    logStream = require("fs").createWriteStream(process.argv[3]);
+  }
 
   process.on("uncaughtException", function(err) {
     server.jesus.stopAll();
