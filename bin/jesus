@@ -13,6 +13,17 @@ var log = function(level, summary, info) {
 if (process.argv[2] === "listen") {
   var server = jesus.createServer().listen();
 
+  process.on("uncaughtException", function(err) {
+    server.jesus.stopAll();
+
+    console.warn(err);
+    console.warn(err.stack);
+
+    setImmediate(function() {
+      process.exit(1);
+    });
+  });
+
   server.on("clientConnected", function() {
     log.info("client connected");
   });
@@ -21,7 +32,7 @@ if (process.argv[2] === "listen") {
     log.info("client disconnected");
   });
 
-  ["processStarted", "processExited", "processError"].forEach(function(event) {
+  ["processStarted", "processExited", "processError", "processTerminated"].forEach(function(event) {
     server.jesus.on(event, function(info) {
       log.info(event.replace(/([a-z])([A-Z])/, "$1 $2").toLowerCase(), info);
     });
@@ -33,32 +44,70 @@ if (process.argv[2] === "start") {
     id: process.argv[3],
     cwd: process.cwd(),
   }, function(err, info) {
+    if (err) {
+      dump_error(err);
+    }
+
     dump_processes([info]);
   });
 }
 
 if (process.argv[2] === "stop") {
   jesus.connect().call("stop", process.argv[3], function(err, info) {
+    if (err) {
+      dump_error(err);
+    }
+
     dump_processes([info]);
   });
 }
 
 if (process.argv[2] === "restart") {
-  jesus.connect().call("restart", function(err, info) {
+  jesus.connect().call("restart", process.argv[3], function(err, info) {
+    if (err) {
+      dump_error(err);
+    }
+
+    dump_processes([info]);
+  });
+}
+
+if (process.argv[2] === "check") {
+  jesus.connect().call("check", process.argv[3], function(err, info) {
+    if (err) {
+      dump_error(err);
+    }
+
     dump_processes([info]);
   });
 }
 
 if (process.argv[2] === "restartall") {
   jesus.connect().call("restartAll", function(err, list) {
+    if (err) {
+      dump_error(err);
+    }
+
     dump_processes(list);
   });
 }
 
 if (process.argv[2] === "list") {
   jesus.connect().call("list", function(err, list) {
+    if (err) {
+      dump_error(err);
+    }
+
     dump_processes(list);
   });
+}
+
+function dump_error(err) {
+  console.warn("");
+  console.warn("Server returned error: " + err);
+  console.warn("");
+
+  process.exit(1);
 }
 
 function dump_processes(list) {
