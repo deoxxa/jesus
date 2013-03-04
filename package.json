@@ -3,6 +3,9 @@
   "version": "0.0.2",
   "description": "Resurrect processes if they die",
   "main": "index.js",
+  "bin": {
+    "jesus": "./bin/jesus"
+  },
   "dependencies": {
     "burro": "~0.4.3",
     "pillion": "~0.0.2"
