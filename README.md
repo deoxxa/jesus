@@ -29,15 +29,23 @@ Also see [example.js](https://github.com/deoxxa/jesus/blob/master/example.js).
 
 _To start a monitoring server_
 
-`user@host:~$ jesus listen [where]`
+`user@host:~$ jesus listen [log]`
 
-Where `where` is a socket location or a host/port. By default, it'll listen in
-`~/.jesus/daemon.sock`. Note that it will not daemonise on its own - you'll have
-to take care of that for now. I run it via upstart.
+Where `log` is a file location for logging. If not supplied, logging will go to
+stdout by default. Note that `listen` does not daemonise the process. You should
+use `daemon` in place of `listen` to do that.
 
 _Example:_
 
 `user@host:~$ jesus listen`
+
+OR
+
+`user@host:~$ jesus listen ~/.jesus/jesus.log`
+
+OR
+
+`user@host:~$ jesus daemon ~/.jesus/jesus.log`
 
 _To start a process_
 
