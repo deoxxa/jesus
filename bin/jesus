@@ -32,6 +32,10 @@ if (process.argv[2] === "listen") {
     log.info("client disconnected");
   });
 
+  server.on("command", function(command) {
+    log.info("command", command);
+  });
+
   ["processStarted", "processExited", "processError", "processTerminated"].forEach(function(event) {
     server.jesus.on(event, function(info) {
       log.info(event.replace(/([a-z])([A-Z])/, "$1 $2").toLowerCase(), info);
