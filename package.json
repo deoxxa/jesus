@@ -1,6 +1,6 @@
 {
   "name": "jesus",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Resurrect processes if they die",
   "main": "index.js",
   "bin": {
