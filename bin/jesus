@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-var jesus = require("..");
+var jesus = require(".."),
+    asciitable = require("asciitable");
 
 var logStream = process.stdout;
 
@@ -129,31 +130,25 @@ function dump_error(err) {
 }
 
 function dump_processes(list) {
-  var pad = function pad(text, length) {
-    return text + (new Array((length - text.toString().length) + 1)).join(" ");
+  var options = {
+    columns: [
+      {name: "ID", field: "id"},
+      {name: "PID", field: "pid"},
+      {name: "Restarts", field: "restarts"},
+      {name: "Last Started", field: "lastStarted"},
+      {name: "Command", field: "command"},
+    ],
   };
 
-  var id_width           = 2,
-      pid_width          = 3,
-      restarts_width     = 8,
-      last_started_width = 12,
-      command_width      = 7;
-
-  list.forEach(function(entry) {
-    id_width           = Math.max(entry.id.length,                              id_width);
-    pid_width          = Math.max(entry.pid.toString(10).length,                pid_width);
-    restarts_width     = Math.max(entry.started.length.toString(10).length,     restarts_width);
-    last_started_width = Math.max(entry.started[entry.started.length-1].length, last_started_width);
-    command_width      = Math.max(entry.args.join(" ").length,                  command_width);
-  });
-
-  console.log((new Array(id_width + pid_width + restarts_width + last_started_width + command_width + 19)).join("-"));
-  console.log(["", pad("ID", id_width), pad("PID", pid_width), pad("Restarts", restarts_width), pad("Last Started", last_started_width), pad("Command", command_width), ""].join(" | "));
-  console.log((new Array(id_width + pid_width + restarts_width + last_started_width + command_width + 19)).join("-"));
-  list.forEach(function(entry) {
-    console.log(["", pad(entry.id, id_width), pad(entry.pid, pid_width), pad(entry.started.length, restarts_width), pad(entry.started[entry.started.length-1], last_started_width), pad(entry.args.join(" "), command_width), ""].join(" | "));
-  });
-  console.log((new Array(id_width + pid_width + restarts_width + last_started_width + command_width + 19)).join("-"));
+  console.log(asciitable(options, list.map(function(e) {
+    return {
+      id: e.id,
+      pid: e.pid.toString(10),
+      restarts: e.started.length.toString(10),
+      lastStarted: e.started[e.started.length-1],
+      command: e.args.join(" "),
+    };
+  })));
 
   process.exit(0);
 }
