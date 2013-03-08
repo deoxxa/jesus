@@ -7,9 +7,9 @@
     "jesus": "./bin/jesus"
   },
   "dependencies": {
-    "burro": "~0.4.3",
-    "pillion": "~0.0.3",
-    "asciitable": "0.0.4"
+    "burro": "~0.4.4",
+    "pillion": "~0.0.5",
+    "asciitable": "~0.0.4"
   },
   "devDependencies": {},
   "repository": {
