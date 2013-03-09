@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 var jesus = require(".."),
-    asciitable = require("asciitable");
+    asciitable = require("asciitable"),
+    vagueTime = require("vague-time");
 
 var logStream = process.stdout;
 
@@ -135,7 +136,7 @@ function dump_processes(list) {
       {name: "ID", field: "id"},
       {name: "PID", field: "pid"},
       {name: "Restarts", field: "restarts"},
-      {name: "Last Started", field: "lastStarted"},
+      {name: "Uptime", field: "uptime"},
       {name: "Command", field: "command"},
     ],
   };
@@ -145,7 +146,7 @@ function dump_processes(list) {
       id: e.id,
       pid: e.pid.toString(10),
       restarts: e.started.length.toString(10),
-      lastStarted: e.started[e.started.length-1],
+      uptime: vagueTime.get({from: new Date(), to: new Date(e.started[e.started.length-1])}).replace(/ ago$/, ""),
       command: e.args.join(" "),
     };
   })));
