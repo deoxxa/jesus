@@ -140,7 +140,7 @@ function dump_processes(list) {
     ],
   };
 
-  console.log(asciitable(options, list.map(function(e) {
+  console.log(asciitable(options, list.sort(function(a, b) { return a.id === b.id ? 0 : a.id > b.id ? 1 : -1; }).map(function(e) {
     return {
       id: e.id,
       pid: e.pid.toString(10),
