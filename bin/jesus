@@ -122,6 +122,15 @@ if (process.argv[2] === "list") {
   });
 }
 
+if (process.argv[2] === "fuck") {
+  console.log("");
+  console.log("jesusabdullah uses JESUS FUCK!");
+  console.log("It was SUPER EFFECTIVE!");
+  console.log("");
+  console.log("You get 472¥ for winning!");
+  console.log("");
+}
+
 function dump_error(err) {
   console.warn("");
   console.warn("Server returned error: " + err);
