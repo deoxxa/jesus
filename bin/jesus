@@ -82,6 +82,16 @@ if (process.argv[2] === "stop") {
   });
 }
 
+if (process.argv[2] === "stopall") {
+  jesus.connect().callRemote("stopAll", function(err, list) {
+    if (err) {
+      dump_error(err);
+    }
+
+    dump_processes(list);
+  });
+}
+
 if (process.argv[2] === "restart") {
   jesus.connect().callRemote("restart", process.argv[3], function(err, info) {
     if (err) {
