@@ -64,11 +64,23 @@ _To stop a process_
 
 Pretty simple. Does what it says on the tin.
 
+_To stop all processes_
+
+`user@host:~$ jesus stopall`
+
+Stops everything that's running.
+
 _To restart a process_
 
 `user@host:~$ jesus restart <id>`
 
 Same as `stop` for the most part. Self-explanatory.
+
+_To restart all processes_
+
+`user@host:~$ jesus restartall`
+
+Much the same as `stopall`, but does a restart instead.
 
 _To list processes_
 
@@ -76,12 +88,6 @@ _To list processes_
 
 This'll give you a nice list of processes that are running, and some limited
 statistics.
-
-_To restart all processes_
-
-`user@host:~$ jesus restartall`
-
-Restarts everything that's running.
 
 License
 -------
