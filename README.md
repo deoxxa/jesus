@@ -16,11 +16,11 @@ Installation
 
 Available via [npm](http://npmjs.org/):
 
-> $ npm install jesus
+> $ npm install jesus -g
 
 Or via git:
 
-> $ git clone git://github.com/deoxxa/jesus.git node_modules/jesus
+> $ npm install git://github.com/deoxxa/jesus.git -g
 
 Usage
 -----
