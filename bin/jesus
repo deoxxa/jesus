@@ -32,6 +32,8 @@ if (process.argv[2] === "listen") {
   process.on("uncaughtException", function(err) {
     server.jesus.stopAll();
 
+    log.error("exception", {message: err.message, stack: err.stack});
+
     console.warn(err);
     console.warn(err.stack);
 
