@@ -43,6 +43,8 @@ Actions:
 Commands
 --------
 
+### listen
+
 ```
 usage: jesus listen [-h] [-H HOST] [-p PORT] [-s SOCKET] [-b BASE_PATH]
                     [-l LOG]
