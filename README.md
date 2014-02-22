@@ -44,8 +44,8 @@ Environment Variables
 ---------------------
 
 `jesus` will use the `JESUS_HOST`, `JESUS_PORT`, `JESUS_SOCKET`, `JESUS_BASE`,
-and `JESUS_LOG` environment variables if they are defined. See below for where
-they are useful.
+`JESUS_LOG`, and `JESUS_STATE` environment variables if they are defined. See
+below for where they are useful.
 
 Commands
 --------
@@ -54,7 +54,7 @@ Commands
 
 ```
 usage: jesus listen [-h] [-H HOST] [-p PORT] [-s SOCKET] [-b BASE_PATH]
-                    [-l LOG]
+                    [-l LOG] [-S STATE]
 
 
 Start jesus listening
@@ -70,13 +70,16 @@ Optional arguments:
                         Base directory for application logs and other files
                         to go in
   -l LOG, --log LOG     Log file for actions taken and events emitted by jesus
+  -S STATE, --state STATE
+                        State file for keeping track of running processes
+                        between starts/stops
 ```
 
 ### daemon
 
 ```
 usage: jesus daemon [-h] [-H HOST] [-p PORT] [-s SOCKET] [-b BASE_PATH]
-                    [-l LOG]
+                    [-l LOG] [-S STATE]
 
 
 Start jesus listening and daemonise
@@ -92,6 +95,9 @@ Optional arguments:
                         Base directory for application logs and other files
                         to go in
   -l LOG, --log LOG     Log file for actions taken and events emitted by jesus
+  -S STATE, --state STATE
+                        State file for keeping track of running processes
+                        between starts/stops
 ```
 
 ### start
