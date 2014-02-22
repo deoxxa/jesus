@@ -10,7 +10,9 @@
     "burro": "~0.4.4",
     "pillion": "~0.0.5",
     "asciitable": "~0.0.4",
-    "vague-time": "~0.5.0"
+    "vague-time": "~0.5.0",
+    "leg": "~1.0.0",
+    "parstack": "0.0.1"
   },
   "devDependencies": {},
   "repository": {

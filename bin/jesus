@@ -2,17 +2,12 @@
 
 var jesus = require(".."),
     asciitable = require("asciitable"),
+    leg = require("leg"),
+    parstack = require("parstack"),
     vagueTime = require("vague-time");
 
-var logStream = process.stdout;
-
-var log = function(level, summary, info) {
-  logStream.write(JSON.stringify([(new Date()).toISOString(), level.toUpperCase(), summary, info]) + "\n");
-};
-
-["debug", "info", "warning", "error"].forEach(function(level) {
-  log[level] = log.bind(null, level);
-});
+var logStream = process.stdout,
+    log = null;
 
 if (process.argv[2] === "daemon") {
   require("child_process").spawn("node", [process.argv[1], "listen"].concat(process.argv.slice(3)), {
@@ -27,15 +22,16 @@ if (process.argv[2] === "listen") {
 
   if (process.argv[3]) {
     logStream = require("fs").createWriteStream(process.argv[3]);
+  } else {
+    logStream = process.stdout;
   }
+
+  log = leg(logStream);
 
   process.on("uncaughtException", function(err) {
     server.jesus.stopAll();
 
-    log.error("exception", {message: err.message, stack: err.stack});
-
-    console.warn(err);
-    console.warn(err.stack);
+    log.error("exception", {err: parstack(err)});
 
     setImmediate(function() {
       process.exit(1);
@@ -43,20 +39,20 @@ if (process.argv[2] === "listen") {
   });
 
   server.on("clientConnected", function() {
-    log.info("client connected");
+    log.info("client connected", {});
   });
 
   server.on("clientDisconnected", function() {
-    log.info("client disconnected");
+    log.info("client disconnected", {});
   });
 
   server.on("command", function(command) {
-    log.info("command", command);
+    log.info("command", {jesus: {command: command}});
   });
 
   ["processStarted", "processExited", "processError", "processTerminated"].forEach(function(event) {
     server.jesus.on(event, function(info) {
-      log.info(event.replace(/([a-z])([A-Z])/, "$1 $2").toLowerCase(), info);
+      log.info(event.replace(/([a-z])([A-Z])/, "$1 $2").toLowerCase(), {jesus: {process: info}});
     });
   });
 }
