@@ -26,42 +26,173 @@ Usage
 -----
 
 ```
-Usage: jesus <action> [options]
+usage: jesus [-h] [-v]
+             {listen,daemon,start,stop,stopall,restart,restartall,check,list}
+             ...
 
-  The `action' portion of the command is case-insensitive
+Resurrect processes if they die
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -v, --version         Show program's version number and exit.
 
 Actions:
+  {listen,daemon,start,stop,stopall,restart,restartall,check,list}
+```
 
-  help
-    you're looking at it!
+Commands
+--------
 
-  listen [file]
-    start jesus supervisor, writing output to `file' if specified,
-    otherwise stdout (console)
+```
+usage: jesus listen [-h] [-H HOST] [-p PORT] [-s SOCKET] [-b BASE_PATH]
+                    [-l LOG]
 
-  daemon [file]
-    same as above, but put the listening process in the background
 
-  start <process name> [command ...]
-    start a process
+Start jesus listening
 
-  stop <process name>
-    stop a process by name
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -b BASE_PATH, --base-path BASE_PATH
+  -l LOG, --log LOG
+```
 
-  stopAll
-    stop all processes
+### daemon
 
-  restart <process name>
-    restart a process by name
+```
+usage: jesus daemon [-h] [-H HOST] [-p PORT] [-s SOCKET] [-b BASE_PATH]
+                    [-l LOG]
 
-  restartAll
-    restart all processes
 
-  check <process name>
-    check the status of a process by name
+Start jesus listening and daemonise
 
-  list
-    check the status of all processes
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -b BASE_PATH, --base-path BASE_PATH
+  -l LOG, --log LOG
+```
+
+### start
+
+```
+usage: jesus start [-h] [-H HOST] [-p PORT] [-s SOCKET] [-n NAME]
+                   [-f {text,json}]
+                   ...
+
+Start a process
+
+Positional arguments:
+  command               command to run and supervise
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -n NAME, --name NAME
+  -f {text,json}, --format {text,json}
+```
+
+### stop
+
+```
+usage: jesus stop [-h] [-H HOST] [-p PORT] [-s SOCKET] [-f {text,json}] name
+
+Stop a process by name
+
+Positional arguments:
+  name
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -f {text,json}, --format {text,json}
+```
+
+### stopall
+
+```
+usage: jesus stopall [-h] [-H HOST] [-p PORT] [-s SOCKET] [-f {text,json}]
+
+Stop all processes
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -f {text,json}, --format {text,json}
+```
+
+### restart
+
+```
+usage: jesus restart [-h] [-H HOST] [-p PORT] [-s SOCKET] [-f {text,json}]
+                     name
+
+Restart a process by name
+
+Positional arguments:
+  name
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -f {text,json}, --format {text,json}
+```
+
+### restartall
+
+```
+usage: jesus restartall [-h] [-H HOST] [-p PORT] [-s SOCKET] [-f {text,json}]
+
+Restart all processes
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -f {text,json}, --format {text,json}
+```
+
+### check
+
+```
+usage: jesus check [-h] [-H HOST] [-p PORT] [-s SOCKET] [-f {text,json}]
+
+Check the status of a process
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -f {text,json}, --format {text,json}
+```
+
+### list
+
+```
+usage: jesus list [-h] [-H HOST] [-p PORT] [-s SOCKET] [-f {text,json}]
+
+List all processes
+
+Optional arguments:
+  -h, --help            Show this help message and exit.
+  -H HOST, --host HOST
+  -p PORT, --port PORT
+  -s SOCKET, --socket SOCKET
+  -f {text,json}, --format {text,json}
 ```
 
 License
