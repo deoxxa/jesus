@@ -104,7 +104,7 @@ var action_listen = function action_listen(argv) {
   var server = jesus.createServer().listen();
 
   if (process.argv[3]) {
-    logStream = require("fs").createWriteStream(process.argv[3]);
+    logStream = require("fs").createWriteStream(process.argv[3], {flags: "a"});
   } else {
     logStream = process.stdout;
   }
