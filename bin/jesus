@@ -3,21 +3,104 @@
 var jesus = require(".."),
     asciitable = require("asciitable"),
     leg = require("leg"),
+    packageInfo = require("../package.json"),
     parstack = require("parstack"),
     vagueTime = require("vague-time");
 
-var logStream = process.stdout,
-    log = null;
+var print_help = function print_help() {
+  console.log("");
+  console.log("Usage: jesus <action> [options]");
+  console.log("");
+  console.log("  The `action' portion of the command is case-insensitive");
+  console.log("");
+  console.log("Actions:");
+  console.log("");
+  console.log("  help");
+  console.log("    you're looking at it!");
+  console.log("");
+  console.log("  listen [file]");
+  console.log("    start jesus supervisor, writing output to `file' if specified,");
+  console.log("    otherwise stdout (console)");
+  console.log("");
+  console.log("  daemon [file]");
+  console.log("    same as above, but put the listening process in the background");
+  console.log("");
+  console.log("  start <process name> [command ...]");
+  console.log("    start a process");
+  console.log("");
+  console.log("  stop <process name>");
+  console.log("    stop a process by name");
+  console.log("");
+  console.log("  stopAll");
+  console.log("    stop all processes");
+  console.log("");
+  console.log("  restart <process name>");
+  console.log("    restart a process by name");
+  console.log("");
+  console.log("  restartAll");
+  console.log("    restart all processes");
+  console.log("");
+  console.log("  check <process name>");
+  console.log("    check the status of a process by name");
+  console.log("");
+  console.log("  list");
+  console.log("    check the status of all processes");
+  console.log("");
+};
 
-if (process.argv[2] === "daemon") {
-  require("child_process").spawn("node", [process.argv[1], "listen"].concat(process.argv.slice(3)), {
-    detached: true,
-    cwd: process.cwd(),
-    stdio: "ignore",
-  }).unref();
-}
+var dump_error = function dump_error(err) {
+  console.warn("");
+  console.warn("Server returned error: " + err);
+  console.warn("");
 
-if (process.argv[2] === "listen") {
+  process.exit(1);
+};
+
+var dump_processes = function dump_processes(list) {
+  var options = {
+    columns: [
+      {name: "ID", field: "id"},
+      {name: "PID", field: "pid"},
+      {name: "Restarts", field: "restarts"},
+      {name: "Uptime", field: "uptime"},
+      {name: "Command", field: "command"},
+    ],
+    skinny: true,
+    intersectionCharacter: "`",
+  };
+
+  console.log(asciitable(options, list.sort(function(a, b) { return a.id === b.id ? 0 : a.id > b.id ? 1 : -1; }).map(function(e) {
+    return {
+      id: e.id,
+      pid: e.pid.toString(10),
+      restarts: e.started.length.toString(10),
+      uptime: vagueTime.get({from: new Date(), to: new Date(e.started[e.started.length-1])}).replace(/ ago$/, ""),
+      command: e.args.join(" "),
+    };
+  })));
+
+  process.exit(0);
+};
+
+var action_help = function action_help(argv) {
+  print_help();
+
+  process.exit(0);
+};
+
+var action_unknown = function action_unknown(action, argv) {
+  console.log("");
+  console.log("Unknown action `%s'", action);
+
+  print_help();
+
+  process.exit(1);
+};
+
+var action_listen = function action_listen(argv) {
+  var logStream = process.stdout,
+      log = null;
+
   var server = jesus.createServer().listen();
 
   if (process.argv[3]) {
@@ -55,9 +138,17 @@ if (process.argv[2] === "listen") {
       log.info(event.replace(/([a-z])([A-Z])/, "$1 $2").toLowerCase(), {jesus: {process: info}});
     });
   });
-}
+};
 
-if (process.argv[2] === "start") {
+var action_daemon = function action_daemon(argv) {
+  require("child_process").spawn("node", [process.argv[1], "listen"].concat(process.argv.slice(3)), {
+    detached: true,
+    cwd: process.cwd(),
+    stdio: "ignore",
+  }).unref();
+};
+
+var action_start = function action_start(argv) {
   jesus.connect().callRemote("start", process.argv.slice(4), {
     id: process.argv[3],
     cwd: process.cwd(),
@@ -68,9 +159,9 @@ if (process.argv[2] === "start") {
 
     dump_processes([info]);
   });
-}
+};
 
-if (process.argv[2] === "stop") {
+var action_stop = function action_stop(argv) {
   jesus.connect().callRemote("stop", process.argv[3], function(err, info) {
     if (err) {
       dump_error(err);
@@ -78,9 +169,9 @@ if (process.argv[2] === "stop") {
 
     dump_processes([info]);
   });
-}
+};
 
-if (process.argv[2] === "stopall") {
+var action_stopAll = function action_stopAll(argv) {
   jesus.connect().callRemote("stopAll", function(err, list) {
     if (err) {
       dump_error(err);
@@ -88,9 +179,9 @@ if (process.argv[2] === "stopall") {
 
     dump_processes(list);
   });
-}
+};
 
-if (process.argv[2] === "restart") {
+var action_restart = function action_restart(argv) {
   jesus.connect().callRemote("restart", process.argv[3], function(err, info) {
     if (err) {
       dump_error(err);
@@ -98,19 +189,9 @@ if (process.argv[2] === "restart") {
 
     dump_processes([info]);
   });
-}
+};
 
-if (process.argv[2] === "check") {
-  jesus.connect().callRemote("check", process.argv[3], function(err, info) {
-    if (err) {
-      dump_error(err);
-    }
-
-    dump_processes([info]);
-  });
-}
-
-if (process.argv[2] === "restartall") {
+var action_restartAll = function action_restartAll(argv) {
   jesus.connect().callRemote("restartAll", function(err, list) {
     if (err) {
       dump_error(err);
@@ -118,9 +199,19 @@ if (process.argv[2] === "restartall") {
 
     dump_processes(list);
   });
-}
+};
 
-if (process.argv[2] === "list") {
+var action_check = function action_check(argv) {
+  jesus.connect().callRemote("check", process.argv[3], function(err, info) {
+    if (err) {
+      dump_error(err);
+    }
+
+    dump_processes([info]);
+  });
+};
+
+var action_list = function action_list(argv) {
   jesus.connect().callRemote("list", function(err, list) {
     if (err) {
       dump_error(err);
@@ -128,45 +219,31 @@ if (process.argv[2] === "list") {
 
     dump_processes(list);
   });
-}
+};
 
-if (process.argv[2] === "fuck") {
+var action_fuck = function action_fuck(argv) {
   console.log("");
   console.log("jesusabdullah uses JESUS FUCK!");
   console.log("It was SUPER EFFECTIVE!");
   console.log("");
   console.log("You get 472¥ for winning!");
   console.log("");
-}
+};
 
-function dump_error(err) {
-  console.warn("");
-  console.warn("Server returned error: " + err);
-  console.warn("");
+var argv = process.argv.slice(2);
 
-  process.exit(1);
-}
+var action = (argv.shift() || "help").toLowerCase();
 
-function dump_processes(list) {
-  var options = {
-    columns: [
-      {name: "ID", field: "id"},
-      {name: "PID", field: "pid"},
-      {name: "Restarts", field: "restarts"},
-      {name: "Uptime", field: "uptime"},
-      {name: "Command", field: "command"},
-    ],
-  };
-
-  console.log(asciitable(options, list.sort(function(a, b) { return a.id === b.id ? 0 : a.id > b.id ? 1 : -1; }).map(function(e) {
-    return {
-      id: e.id,
-      pid: e.pid.toString(10),
-      restarts: e.started.length.toString(10),
-      uptime: vagueTime.get({from: new Date(), to: new Date(e.started[e.started.length-1])}).replace(/ ago$/, ""),
-      command: e.args.join(" "),
-    };
-  })));
-
-  process.exit(0);
+switch (action) {
+  case "listen": action_listen(argv); break;
+  case "daemon": action_daemon(argv); break;
+  case "start": action_start(argv); break;
+  case "stop": action_stop(argv); break;
+  case "stopall": action_stopAll(argv); break;
+  case "restart": action_restart(argv); break;
+  case "restartall": action_restartAll(argv); break;
+  case "check": action_check(argv); break;
+  case "list": action_list(argv); break;
+  case "help": action_help(argv); break;
+  default: action_unknown(action, argv); break;
 }
