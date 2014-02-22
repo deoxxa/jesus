@@ -50,7 +50,17 @@ var print_help = function print_help() {
 
 var dump_error = function dump_error(err) {
   console.warn("");
-  console.warn("Server returned error: " + err);
+  console.warn("Server reported error: %j", err);
+  console.warn("");
+
+  process.exit(1);
+};
+
+var dump_local_error = function dump_local_error(err) {
+  console.warn("");
+  console.warn("An error occurred:");
+  console.warn("");
+  console.warn(JSON.stringify(parstack(err), null, 2));
   console.warn("");
 
   process.exit(1);
@@ -111,6 +121,8 @@ var action_listen = function action_listen(argv) {
 
   log = leg(logStream);
 
+  log.info("started", {});
+
   process.on("uncaughtException", function(err) {
     server.jesus.stopAll();
 
@@ -149,7 +161,7 @@ var action_daemon = function action_daemon(argv) {
 };
 
 var action_start = function action_start(argv) {
-  jesus.connect().callRemote("start", process.argv.slice(4), {
+  jesus.connect().on("error", dump_local_error).callRemote("start", process.argv.slice(4), {
     id: process.argv[3],
     cwd: process.cwd(),
   }, function(err, info) {
@@ -162,7 +174,7 @@ var action_start = function action_start(argv) {
 };
 
 var action_stop = function action_stop(argv) {
-  jesus.connect().callRemote("stop", process.argv[3], function(err, info) {
+  jesus.connect().on("error", dump_local_error).callRemote("stop", process.argv[3], function(err, info) {
     if (err) {
       dump_error(err);
     }
@@ -172,7 +184,7 @@ var action_stop = function action_stop(argv) {
 };
 
 var action_stopAll = function action_stopAll(argv) {
-  jesus.connect().callRemote("stopAll", function(err, list) {
+  jesus.connect().on("error", dump_local_error).callRemote("stopAll", function(err, list) {
     if (err) {
       dump_error(err);
     }
@@ -182,7 +194,7 @@ var action_stopAll = function action_stopAll(argv) {
 };
 
 var action_restart = function action_restart(argv) {
-  jesus.connect().callRemote("restart", process.argv[3], function(err, info) {
+  jesus.connect().on("error", dump_local_error).callRemote("restart", process.argv[3], function(err, info) {
     if (err) {
       dump_error(err);
     }
@@ -192,7 +204,7 @@ var action_restart = function action_restart(argv) {
 };
 
 var action_restartAll = function action_restartAll(argv) {
-  jesus.connect().callRemote("restartAll", function(err, list) {
+  jesus.connect().on("error", dump_local_error).callRemote("restartAll", function(err, list) {
     if (err) {
       dump_error(err);
     }
@@ -202,7 +214,7 @@ var action_restartAll = function action_restartAll(argv) {
 };
 
 var action_check = function action_check(argv) {
-  jesus.connect().callRemote("check", process.argv[3], function(err, info) {
+  jesus.connect().on("error", dump_local_error).callRemote("check", process.argv[3], function(err, info) {
     if (err) {
       dump_error(err);
     }
@@ -212,7 +224,7 @@ var action_check = function action_check(argv) {
 };
 
 var action_list = function action_list(argv) {
-  jesus.connect().callRemote("list", function(err, list) {
+  jesus.connect().on("error", dump_local_error).callRemote("list", function(err, list) {
     if (err) {
       dump_error(err);
     }
