@@ -25,69 +25,44 @@ Or via git:
 Usage
 -----
 
-Also see [example.js](https://github.com/deoxxa/jesus/blob/master/example.js).
+```
+Usage: jesus <action> [options]
 
-_To start a monitoring server_
+  The `action' portion of the command is case-insensitive
 
-`user@host:~$ jesus listen [log]`
+Actions:
 
-Where `log` is a file location for logging. If not supplied, logging will go to
-stdout by default. Note that `listen` does not daemonise the process. You should
-use `daemon` in place of `listen` to do that.
+  help
+    you're looking at it!
 
-_Example:_
+  listen [file]
+    start jesus supervisor, writing output to `file' if specified,
+    otherwise stdout (console)
 
-`user@host:~$ jesus listen`
+  daemon [file]
+    same as above, but put the listening process in the background
 
-OR
+  start <process name> [command ...]
+    start a process
 
-`user@host:~$ jesus listen ~/.jesus/jesus.log`
+  stop <process name>
+    stop a process by name
 
-OR
+  stopAll
+    stop all processes
 
-`user@host:~$ jesus daemon ~/.jesus/jesus.log`
+  restart <process name>
+    restart a process by name
 
-_To start a process_
+  restartAll
+    restart all processes
 
-`user@host:~$ jesus start <id> [argument1 [argument2 ...]]`
+  check <process name>
+    check the status of a process by name
 
-`id` is a string. It tells Jesus how to identify your process to you. The
-`argument` bits are basically just the rest of your command.
-
-_Example:_
-
-`user@host:~$ jesus start nc.1 nc -l -p 8001`
-
-_To stop a process_
-
-`user@host:~$ jesus stop <id>`
-
-Pretty simple. Does what it says on the tin.
-
-_To stop all processes_
-
-`user@host:~$ jesus stopall`
-
-Stops everything that's running.
-
-_To restart a process_
-
-`user@host:~$ jesus restart <id>`
-
-Same as `stop` for the most part. Self-explanatory.
-
-_To restart all processes_
-
-`user@host:~$ jesus restartall`
-
-Much the same as `stopall`, but does a restart instead.
-
-_To list processes_
-
-`user@host:~$ jesus list`
-
-This'll give you a nice list of processes that are running, and some limited
-statistics.
+  list
+    check the status of all processes
+```
 
 License
 -------
