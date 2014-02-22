@@ -57,10 +57,32 @@ var dump_error = function dump_error(err) {
 };
 
 var dump_local_error = function dump_local_error(err) {
+  if (err.message === "connect ECONNREFUSED") {
+    console.warn("");
+    console.warn("It looks like there's no jesus daemon running!");
+    console.warn("");
+    console.warn("You probably want to run `jesus daemon /path/to/log/file'");
+    console.warn("");
+    console.warn("In case this diagnosis is wrong, here's an error trace:");
+  } else {
+    console.warn("");
+    console.warn("An error occurred and it's not clear what caused it!");
+    console.warn("");
+    console.warn("Please post an issue about the error trace below:");
+    console.warn("");
+    console.warn("  https://github.com/deoxxa/jesus/issues/new");
+    console.warn("");
+    console.warn("Or just click this link and send me an email:");
+    console.warn("");
+    console.warn("  mailto:deoxxa@fknsrs.biz?subject=Jesus%20Is%20Broken%21&body=" + escape([
+      err.stack,
+      ["jesus", packageInfo.version].join("@"),
+      JSON.stringify(process.versions, null, 2),
+    ].join("\n\n")));
+  }
+
   console.warn("");
-  console.warn("An error occurred:");
-  console.warn("");
-  console.warn(JSON.stringify(parstack(err), null, 2));
+  console.warn(err.stack);
   console.warn("");
 
   process.exit(1);
