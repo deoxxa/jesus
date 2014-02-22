@@ -3,6 +3,7 @@
 var jesus = require(".."),
     ArgumentParser = require("argparse").ArgumentParser,
     asciitable = require("asciitable"),
+    fs = require("fs"),
     leg = require("leg"),
     packageInfo = require("../package.json"),
     parstack = require("parstack"),
@@ -79,7 +80,8 @@ var action_listen = function action_listen(args) {
   var logStream = process.stdout,
       log = null;
 
-  var server = null;
+  var server = null,
+      persistent = {};
 
   var options = {
     basepath: args.base_path,
@@ -97,6 +99,12 @@ var action_listen = function action_listen(args) {
     logStream = require("fs").createWriteStream(args.log, {flags: "a"});
   } else {
     logStream = process.stdout;
+  }
+
+  if (args.state) {
+    try {
+      persistent = require(args.state);
+    } catch (e) {}
   }
 
   log = leg(logStream);
@@ -125,11 +133,42 @@ var action_listen = function action_listen(args) {
     log.info("command", {jesus: {command: command}});
   });
 
+  server.on("command", function(command) {
+    if (command[0] !== "start" && command[0] !== "stop" && command[0] !== "stopAll") {
+      return;
+    }
+
+    if (command[0] === "start") {
+      persistent[command[2].id] = {
+        command: command[1],
+        options: command[2],
+      };
+    }
+
+    if (command[0] === "stop") {
+      delete persistent[command[2].id];
+    }
+
+    if (command[0] === "stopAll") {
+      for (var k in persistent) {
+        delete persistent[k];
+      }
+    }
+
+    if (args.state) {
+      fs.writeFileSync(args.state, JSON.stringify(persistent, null, 2));
+    }
+  });
+
   ["processStarted", "processExited", "processError", "processTerminated"].forEach(function(event) {
     server.jesus.on(event, function(info) {
       log.info(event.replace(/([a-z])([A-Z])/, "$1 $2").toLowerCase(), {jesus: {process: info}});
     });
   });
+
+  for (var k in persistent) {
+    server.jesus.start(persistent[k].command, persistent[k].options);
+  }
 };
 
 var action_daemon = function action_daemon(args) {
@@ -282,6 +321,10 @@ sc_listen.addArgument(["-l", "--log"], {
   defaultValue: process.env.JESUS_LOG,
   help: "Log file for actions taken and events emitted by jesus"
 });
+sc_listen.addArgument(["-S", "--state"], {
+  defaultValue: process.env.JESUS_STATE,
+  help: "State file for keeping track of running processes between starts/stops",
+});
 
 var sc_daemon = sp.addParser("daemon", {
   description: "Start jesus listening and daemonise",
@@ -305,6 +348,10 @@ sc_daemon.addArgument(["-b", "--base-path"], {
 sc_daemon.addArgument(["-l", "--log"], {
   defaultValue: process.env.JESUS_LOG,
   help: "Log file for actions taken and events emitted by jesus"
+});
+sc_daemon.addArgument(["-S", "--state"], {
+  defaultValue: process.env.JESUS_STATE,
+  help: "State file for keeping track of running processes between starts/stops",
 });
 
 var sc_start = sp.addParser("start", {
