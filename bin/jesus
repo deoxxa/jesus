@@ -8,44 +8,44 @@ var jesus = require(".."),
     vagueTime = require("vague-time");
 
 var print_help = function print_help() {
-  console.log("");
-  console.log("Usage: jesus <action> [options]");
-  console.log("");
-  console.log("  The `action' portion of the command is case-insensitive");
-  console.log("");
-  console.log("Actions:");
-  console.log("");
-  console.log("  help");
-  console.log("    you're looking at it!");
-  console.log("");
-  console.log("  listen [file]");
-  console.log("    start jesus supervisor, writing output to `file' if specified,");
-  console.log("    otherwise stdout (console)");
-  console.log("");
-  console.log("  daemon [file]");
-  console.log("    same as above, but put the listening process in the background");
-  console.log("");
-  console.log("  start <process name> [command ...]");
-  console.log("    start a process");
-  console.log("");
-  console.log("  stop <process name>");
-  console.log("    stop a process by name");
-  console.log("");
-  console.log("  stopAll");
-  console.log("    stop all processes");
-  console.log("");
-  console.log("  restart <process name>");
-  console.log("    restart a process by name");
-  console.log("");
-  console.log("  restartAll");
-  console.log("    restart all processes");
-  console.log("");
-  console.log("  check <process name>");
-  console.log("    check the status of a process by name");
-  console.log("");
-  console.log("  list");
-  console.log("    check the status of all processes");
-  console.log("");
+  console.warn("");
+  console.warn("Usage: jesus <action> [options]");
+  console.warn("");
+  console.warn("  The `action' portion of the command is case-insensitive");
+  console.warn("");
+  console.warn("Actions:");
+  console.warn("");
+  console.warn("  help");
+  console.warn("    you're looking at it!");
+  console.warn("");
+  console.warn("  listen [file]");
+  console.warn("    start jesus supervisor, writing output to `file' if specified,");
+  console.warn("    otherwise stdout (console)");
+  console.warn("");
+  console.warn("  daemon [file]");
+  console.warn("    same as above, but put the listening process in the background");
+  console.warn("");
+  console.warn("  start <process name> [command ...]");
+  console.warn("    start a process");
+  console.warn("");
+  console.warn("  stop <process name>");
+  console.warn("    stop a process by name");
+  console.warn("");
+  console.warn("  stopAll");
+  console.warn("    stop all processes");
+  console.warn("");
+  console.warn("  restart <process name>");
+  console.warn("    restart a process by name");
+  console.warn("");
+  console.warn("  restartAll");
+  console.warn("    restart all processes");
+  console.warn("");
+  console.warn("  check <process name>");
+  console.warn("    check the status of a process by name");
+  console.warn("");
+  console.warn("  list");
+  console.warn("    check the status of all processes");
+  console.warn("");
 };
 
 var dump_error = function dump_error(err) {
@@ -121,8 +121,8 @@ var action_help = function action_help(argv) {
 };
 
 var action_unknown = function action_unknown(action, argv) {
-  console.log("");
-  console.log("Unknown action `%s'", action);
+  console.warn("");
+  console.warn("Unknown action `%s'", action);
 
   print_help();
 
