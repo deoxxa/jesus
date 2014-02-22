@@ -40,6 +40,13 @@ Actions:
   {listen,daemon,start,stop,stopall,restart,restartall,check,list}
 ```
 
+Environment Variables
+---------------------
+
+`jesus` will use the `JESUS_HOST`, `JESUS_PORT`, `JESUS_SOCKET`, `JESUS_BASE`,
+and `JESUS_LOG` environment variables if they are defined. See below for where
+they are useful.
+
 Commands
 --------
 
@@ -54,11 +61,15 @@ Start jesus listening
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host for jesus to listen on
+  -p PORT, --port PORT  Port for jesus to listen on
   -s SOCKET, --socket SOCKET
+                        Unix socket for jesus to listen on (only used if
+                        host/port are not)
   -b BASE_PATH, --base-path BASE_PATH
-  -l LOG, --log LOG
+                        Base directory for application logs and other files
+                        to go in
+  -l LOG, --log LOG     Log file for actions taken and events emitted by jesus
 ```
 
 ### daemon
@@ -72,11 +83,15 @@ Start jesus listening and daemonise
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host for jesus to listen on
+  -p PORT, --port PORT  Port for jesus to listen on
   -s SOCKET, --socket SOCKET
+                        Unix socket for jesus to listen on (only used if
+                        host/port are not)
   -b BASE_PATH, --base-path BASE_PATH
-  -l LOG, --log LOG
+                        Base directory for application logs and other files
+                        to go in
+  -l LOG, --log LOG     Log file for actions taken and events emitted by jesus
 ```
 
 ### start
@@ -89,13 +104,15 @@ usage: jesus start [-h] [-H HOST] [-p PORT] [-s SOCKET] [-n NAME]
 Start a process
 
 Positional arguments:
-  command               command to run and supervise
+  command               Command to run and supervise
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host where server for jesus to connect to is listening
+  -p PORT, --port PORT  Port where server for jesus to connect to is listening
   -s SOCKET, --socket SOCKET
+                        Unix socket where server for jesus to connect to is
+                        listening (only used if host/port are not)
   -n NAME, --name NAME
   -f {text,json}, --format {text,json}
 ```
@@ -112,9 +129,11 @@ Positional arguments:
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host where server for jesus to connect to is listening
+  -p PORT, --port PORT  Port where server for jesus to connect to is listening
   -s SOCKET, --socket SOCKET
+                        Unix socket where server for jesus to connect to is
+                        listening (only used if host/port are not)
   -f {text,json}, --format {text,json}
 ```
 
@@ -127,9 +146,11 @@ Stop all processes
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host where server for jesus to connect to is listening
+  -p PORT, --port PORT  Port where server for jesus to connect to is listening
   -s SOCKET, --socket SOCKET
+                        Unix socket where server for jesus to connect to is
+                        listening (only used if host/port are not)
   -f {text,json}, --format {text,json}
 ```
 
@@ -146,9 +167,11 @@ Positional arguments:
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host where server for jesus to connect to is listening
+  -p PORT, --port PORT  Port where server for jesus to connect to is listening
   -s SOCKET, --socket SOCKET
+                        Unix socket where server for jesus to connect to is
+                        listening (only used if host/port are not)
   -f {text,json}, --format {text,json}
 ```
 
@@ -161,9 +184,11 @@ Restart all processes
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host where server for jesus to connect to is listening
+  -p PORT, --port PORT  Port where server for jesus to connect to is listening
   -s SOCKET, --socket SOCKET
+                        Unix socket where server for jesus to connect to is
+                        listening (only used if host/port are not)
   -f {text,json}, --format {text,json}
 ```
 
@@ -176,9 +201,11 @@ Check the status of a process
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host where server for jesus to connect to is listening
+  -p PORT, --port PORT  Port where server for jesus to connect to is listening
   -s SOCKET, --socket SOCKET
+                        Unix socket where server for jesus to connect to is
+                        listening (only used if host/port are not)
   -f {text,json}, --format {text,json}
 ```
 
@@ -191,9 +218,11 @@ List all processes
 
 Optional arguments:
   -h, --help            Show this help message and exit.
-  -H HOST, --host HOST
-  -p PORT, --port PORT
+  -H HOST, --host HOST  Host where server for jesus to connect to is listening
+  -p PORT, --port PORT  Port where server for jesus to connect to is listening
   -s SOCKET, --socket SOCKET
+                        Unix socket where server for jesus to connect to is
+                        listening (only used if host/port are not)
   -f {text,json}, --format {text,json}
 ```
 

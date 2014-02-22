@@ -262,105 +262,198 @@ var sp = ap.addSubparsers({
 var sc_listen = sp.addParser("listen", {
   description: "Start jesus listening",
 });
-sc_listen.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_listen.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_listen.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
-sc_listen.addArgument(["-b", "--base-path"], {defaultValue: process.env.JESUS_BASE});
-sc_listen.addArgument(["-l", "--log"], {defaultValue: process.env.JESUS_LOG});
+sc_listen.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host for jesus to listen on",
+});
+sc_listen.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port for jesus to listen on",
+});
+sc_listen.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket for jesus to listen on (only used if host/port are not)",
+});
+sc_listen.addArgument(["-b", "--base-path"], {
+  defaultValue: process.env.JESUS_BASE,
+  help: "Base directory for application logs and other files to go in",
+});
+sc_listen.addArgument(["-l", "--log"], {
+  defaultValue: process.env.JESUS_LOG,
+  help: "Log file for actions taken and events emitted by jesus"
+});
 
 var sc_daemon = sp.addParser("daemon", {
   description: "Start jesus listening and daemonise",
 });
-sc_daemon.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_daemon.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_daemon.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
-sc_daemon.addArgument(["-b", "--base-path"], {defaultValue: process.env.JESUS_BASE});
-sc_daemon.addArgument(["-l", "--log"]);
+sc_daemon.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host for jesus to listen on",
+});
+sc_daemon.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port for jesus to listen on",
+});
+sc_daemon.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket for jesus to listen on (only used if host/port are not)",
+});
+sc_daemon.addArgument(["-b", "--base-path"], {
+  defaultValue: process.env.JESUS_BASE,
+  help: "Base directory for application logs and other files to go in",
+});
+sc_daemon.addArgument(["-l", "--log"], {
+  defaultValue: process.env.JESUS_LOG,
+  help: "Log file for actions taken and events emitted by jesus"
+});
 
 var sc_start = sp.addParser("start", {
   description: "Start a process",
 });
-sc_start.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_start.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_start.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_start.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host where server for jesus to connect to is listening",
+});
+sc_start.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port where server for jesus to connect to is listening",
+});
+sc_start.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket where server for jesus to connect to is listening (only used if host/port are not)",
+});
 sc_start.addArgument(["-n", "--name"], {
   defaultValue: (function() { return randomId(4); })(),
 });
 sc_start.addArgument(["-f", "--format"], {
+  defaultValue: process.env.JESUS_FORMAT || "text",
   choices: ["text", "json"],
-  defaultValue: "text",
 });
 sc_start.addArgument(["command"], {
   nargs: "...",
-  help: "command to run and supervise",
+  help: "Command to run and supervise",
 });
 
 var sc_stop = sp.addParser("stop", {
   description: "Stop a process by name",
 });
-sc_stop.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_stop.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_stop.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_stop.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host where server for jesus to connect to is listening",
+});
+sc_stop.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port where server for jesus to connect to is listening",
+});
+sc_stop.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket where server for jesus to connect to is listening (only used if host/port are not)",
+});
 sc_stop.addArgument(["-f", "--format"], {
+  defaultValue: process.env.JESUS_FORMAT || "text",
   choices: ["text", "json"],
-  defaultValue: "text",
 });
 sc_stop.addArgument(["name"]);
 
 var sc_stopall = sp.addParser("stopall", {
   description: "Stop all processes",
 });
-sc_stopall.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_stopall.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_stopall.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_stopall.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host where server for jesus to connect to is listening",
+});
+sc_stopall.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port where server for jesus to connect to is listening",
+});
+sc_stopall.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket where server for jesus to connect to is listening (only used if host/port are not)",
+});
 sc_stopall.addArgument(["-f", "--format"], {
+  defaultValue: process.env.JESUS_FORMAT || "text",
   choices: ["text", "json"],
-  defaultValue: "text",
 });
 
 var sc_restart = sp.addParser("restart", {
   description: "Restart a process by name",
 });
-sc_restart.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_restart.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_restart.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_restart.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host where server for jesus to connect to is listening",
+});
+sc_restart.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port where server for jesus to connect to is listening",
+});
+sc_restart.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket where server for jesus to connect to is listening (only used if host/port are not)",
+});
 sc_restart.addArgument(["-f", "--format"], {
+  defaultValue: process.env.JESUS_FORMAT || "text",
   choices: ["text", "json"],
-  defaultValue: "text",
 });
 sc_restart.addArgument(["name"]);
 
 var sc_restartall = sp.addParser("restartall", {
   description: "Restart all processes",
 });
-sc_restartall.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_restartall.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_restartall.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_restartall.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host where server for jesus to connect to is listening",
+});
+sc_restartall.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port where server for jesus to connect to is listening",
+});
+sc_restartall.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket where server for jesus to connect to is listening (only used if host/port are not)",
+});
 sc_restartall.addArgument(["-f", "--format"], {
+  defaultValue: process.env.JESUS_FORMAT || "text",
   choices: ["text", "json"],
-  defaultValue: "text",
 });
 
 var sc_check = sp.addParser("check", {
   description: "Check the status of a process",
 });
-sc_check.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_check.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_check.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_check.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host where server for jesus to connect to is listening",
+});
+sc_check.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port where server for jesus to connect to is listening",
+});
+sc_check.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket where server for jesus to connect to is listening (only used if host/port are not)",
+});
 sc_check.addArgument(["-f", "--format"], {
+  defaultValue: process.env.JESUS_FORMAT || "text",
   choices: ["text", "json"],
-  defaultValue: "text",
 });
 
 var sc_list = sp.addParser("list", {
   description: "List all processes",
 });
-sc_list.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
-sc_list.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
-sc_list.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_list.addArgument(["-H", "--host"], {
+  defaultValue: process.env.JESUS_HOST,
+  help: "Host where server for jesus to connect to is listening",
+});
+sc_list.addArgument(["-p", "--port"], {
+  defaultValue: process.env.JESUS_PORT,
+  help: "Port where server for jesus to connect to is listening",
+});
+sc_list.addArgument(["-s", "--socket"], {
+  defaultValue: process.env.JESUS_SOCKET,
+  help: "Unix socket where server for jesus to connect to is listening (only used if host/port are not)",
+});
 sc_list.addArgument(["-f", "--format"], {
+  defaultValue: process.env.JESUS_FORMAT || "text",
   choices: ["text", "json"],
-  defaultValue: "text",
 });
 
 var args = ap.parseArgs();
