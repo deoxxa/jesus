@@ -1,52 +1,13 @@
 #!/usr/bin/env node
 
 var jesus = require(".."),
+    ArgumentParser = require("argparse").ArgumentParser,
     asciitable = require("asciitable"),
     leg = require("leg"),
     packageInfo = require("../package.json"),
     parstack = require("parstack"),
+    randomId = require("proquint-random-id"),
     vagueTime = require("vague-time");
-
-var print_help = function print_help() {
-  console.warn("");
-  console.warn("Usage: jesus <action> [options]");
-  console.warn("");
-  console.warn("  The `action' portion of the command is case-insensitive");
-  console.warn("");
-  console.warn("Actions:");
-  console.warn("");
-  console.warn("  help");
-  console.warn("    you're looking at it!");
-  console.warn("");
-  console.warn("  listen [file]");
-  console.warn("    start jesus supervisor, writing output to `file' if specified,");
-  console.warn("    otherwise stdout (console)");
-  console.warn("");
-  console.warn("  daemon [file]");
-  console.warn("    same as above, but put the listening process in the background");
-  console.warn("");
-  console.warn("  start <process name> [command ...]");
-  console.warn("    start a process");
-  console.warn("");
-  console.warn("  stop <process name>");
-  console.warn("    stop a process by name");
-  console.warn("");
-  console.warn("  stopAll");
-  console.warn("    stop all processes");
-  console.warn("");
-  console.warn("  restart <process name>");
-  console.warn("    restart a process by name");
-  console.warn("");
-  console.warn("  restartAll");
-  console.warn("    restart all processes");
-  console.warn("");
-  console.warn("  check <process name>");
-  console.warn("    check the status of a process by name");
-  console.warn("");
-  console.warn("  list");
-  console.warn("    check the status of all processes");
-  console.warn("");
-};
 
 var dump_error = function dump_error(err) {
   console.warn("");
@@ -61,7 +22,7 @@ var dump_local_error = function dump_local_error(err) {
     console.warn("");
     console.warn("It looks like there's no jesus daemon running!");
     console.warn("");
-    console.warn("You probably want to run `jesus daemon /path/to/log/file'");
+    console.warn("You probably want to run `jesus daemon -l /path/to/log/file'");
     console.warn("");
     console.warn("In case this diagnosis is wrong, here's an error trace:");
   } else {
@@ -114,29 +75,26 @@ var dump_processes = function dump_processes(list) {
   process.exit(0);
 };
 
-var action_help = function action_help(argv) {
-  print_help();
-
-  process.exit(0);
-};
-
-var action_unknown = function action_unknown(action, argv) {
-  console.warn("");
-  console.warn("Unknown action `%s'", action);
-
-  print_help();
-
-  process.exit(1);
-};
-
-var action_listen = function action_listen(argv) {
+var action_listen = function action_listen(args) {
   var logStream = process.stdout,
       log = null;
 
-  var server = jesus.createServer().listen();
+  var server = null;
 
-  if (process.argv[3]) {
-    logStream = require("fs").createWriteStream(process.argv[3], {flags: "a"});
+  var options = {
+    basepath: args.base_path,
+  };
+
+  if (args.port) {
+    server = jesus.createServer(options).listen(args.port, args.host);
+  } else if (args.socket) {
+    server = jesus.createServer(options).listen(args.socket);
+  } else {
+    server = jesus.createServer(options).listen();
+  }
+
+  if (args.log) {
+    logStream = require("fs").createWriteStream(args.log, {flags: "a"});
   } else {
     logStream = process.stdout;
   }
@@ -174,7 +132,7 @@ var action_listen = function action_listen(argv) {
   });
 };
 
-var action_daemon = function action_daemon(argv) {
+var action_daemon = function action_daemon(args) {
   require("child_process").spawn("node", [process.argv[1], "listen"].concat(process.argv.slice(3)), {
     detached: true,
     cwd: process.cwd(),
@@ -182,93 +140,239 @@ var action_daemon = function action_daemon(argv) {
   }).unref();
 };
 
-var action_start = function action_start(argv) {
-  jesus.connect().on("error", dump_local_error).callRemote("start", process.argv.slice(4), {
-    id: process.argv[3],
+var action_start = function action_start(args) {
+  jesus.connect(args.port || args.socket, args.host).on("error", dump_local_error).callRemote("start", args.command, {
+    id: args.name,
     cwd: process.cwd(),
   }, function(err, info) {
     if (err) {
       dump_error(err);
     }
 
-    dump_processes([info]);
-  });
-};
-
-var action_stop = function action_stop(argv) {
-  jesus.connect().on("error", dump_local_error).callRemote("stop", process.argv[3], function(err, info) {
-    if (err) {
-      dump_error(err);
+    if (args.format === "json") {
+      console.log(JSON.stringify(info));
+      process.exit(0);
     }
 
     dump_processes([info]);
   });
 };
 
-var action_stopAll = function action_stopAll(argv) {
-  jesus.connect().on("error", dump_local_error).callRemote("stopAll", function(err, list) {
+var action_stop = function action_stop(args) {
+  jesus.connect(args.port || args.socket, args.host).on("error", dump_local_error).callRemote("stop", args.name, function(err, info) {
     if (err) {
       dump_error(err);
+    }
+
+    if (args.format === "json") {
+      console.log(JSON.stringify(info));
+      process.exit(0);
+    }
+
+    dump_processes([info]);
+  });
+};
+
+var action_stopAll = function action_stopAll(args) {
+  jesus.connect(args.port || args.socket, args.host).on("error", dump_local_error).callRemote("stopAll", function(err, list) {
+    if (err) {
+      dump_error(err);
+    }
+
+    if (args.format === "json") {
+      console.log(JSON.stringify(list));
+      process.exit(0);
     }
 
     dump_processes(list);
   });
 };
 
-var action_restart = function action_restart(argv) {
-  jesus.connect().on("error", dump_local_error).callRemote("restart", process.argv[3], function(err, info) {
+var action_restart = function action_restart(args) {
+  jesus.connect(args.port || args.socket, args.host).on("error", dump_local_error).callRemote("restart", args.name, function(err, info) {
     if (err) {
       dump_error(err);
+    }
+
+    if (args.format === "json") {
+      console.log(JSON.stringify(info));
+      process.exit(0);
     }
 
     dump_processes([info]);
   });
 };
 
-var action_restartAll = function action_restartAll(argv) {
-  jesus.connect().on("error", dump_local_error).callRemote("restartAll", function(err, list) {
+var action_restartAll = function action_restartAll(args) {
+  jesus.connect(args.port || args.socket, args.host).on("error", dump_local_error).callRemote("restartAll", function(err, list) {
     if (err) {
       dump_error(err);
+    }
+
+    if (args.format === "json") {
+      console.log(JSON.stringify(list));
+      process.exit(0);
     }
 
     dump_processes(list);
   });
 };
 
-var action_check = function action_check(argv) {
-  jesus.connect().on("error", dump_local_error).callRemote("check", process.argv[3], function(err, info) {
+var action_check = function action_check(args) {
+  jesus.connect(args.port || args.socket, args.host).on("error", dump_local_error).callRemote("check", args.name, function(err, info) {
     if (err) {
       dump_error(err);
+    }
+
+    if (args.format === "json") {
+      console.log(JSON.stringify(info));
+      process.exit(0);
     }
 
     dump_processes([info]);
   });
 };
 
-var action_list = function action_list(argv) {
-  jesus.connect().on("error", dump_local_error).callRemote("list", function(err, list) {
+var action_list = function action_list(args) {
+  jesus.connect(args.port || args.socket, args.host).on("error", dump_local_error).callRemote("list", function(err, list) {
     if (err) {
       dump_error(err);
+    }
+
+    if (args.format === "json") {
+      console.log(JSON.stringify(list));
+      process.exit(0);
     }
 
     dump_processes(list);
   });
 };
 
-var argv = process.argv.slice(2);
+var ap = new ArgumentParser({
+  version: packageInfo.version,
+  addHelp: true,
+  description: packageInfo.description,
+});
 
-var action = (argv.shift() || "help").toLowerCase();
+var sp = ap.addSubparsers({
+  title: "Actions",
+  dest: "action",
+});
 
-switch (action) {
-  case "listen": action_listen(argv); break;
-  case "daemon": action_daemon(argv); break;
-  case "start": action_start(argv); break;
-  case "stop": action_stop(argv); break;
-  case "stopall": action_stopAll(argv); break;
-  case "restart": action_restart(argv); break;
-  case "restartall": action_restartAll(argv); break;
-  case "check": action_check(argv); break;
-  case "list": action_list(argv); break;
-  case "help": action_help(argv); break;
-  default: action_unknown(action, argv); break;
+var sc_listen = sp.addParser("listen", {
+  description: "Start jesus listening",
+});
+sc_listen.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_listen.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_listen.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_listen.addArgument(["-b", "--base-path"], {defaultValue: process.env.JESUS_BASE});
+sc_listen.addArgument(["-l", "--log"], {defaultValue: process.env.JESUS_LOG});
+
+var sc_daemon = sp.addParser("daemon", {
+  description: "Start jesus listening and daemonise",
+});
+sc_daemon.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_daemon.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_daemon.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_daemon.addArgument(["-b", "--base-path"], {defaultValue: process.env.JESUS_BASE});
+sc_daemon.addArgument(["-l", "--log"]);
+
+var sc_start = sp.addParser("start", {
+  description: "Start a process",
+});
+sc_start.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_start.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_start.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_start.addArgument(["-n", "--name"], {
+  defaultValue: (function() { return randomId(4); })(),
+});
+sc_start.addArgument(["-f", "--format"], {
+  choices: ["text", "json"],
+  defaultValue: "text",
+});
+sc_start.addArgument(["command"], {
+  nargs: "...",
+  help: "command to run and supervise",
+});
+
+var sc_stop = sp.addParser("stop", {
+  description: "Stop a process by name",
+});
+sc_stop.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_stop.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_stop.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_stop.addArgument(["-f", "--format"], {
+  choices: ["text", "json"],
+  defaultValue: "text",
+});
+sc_stop.addArgument(["name"]);
+
+var sc_stopall = sp.addParser("stopall", {
+  description: "Stop all processes",
+});
+sc_stopall.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_stopall.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_stopall.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_stopall.addArgument(["-f", "--format"], {
+  choices: ["text", "json"],
+  defaultValue: "text",
+});
+
+var sc_restart = sp.addParser("restart", {
+  description: "Restart a process by name",
+});
+sc_restart.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_restart.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_restart.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_restart.addArgument(["-f", "--format"], {
+  choices: ["text", "json"],
+  defaultValue: "text",
+});
+sc_restart.addArgument(["name"]);
+
+var sc_restartall = sp.addParser("restartall", {
+  description: "Restart all processes",
+});
+sc_restartall.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_restartall.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_restartall.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_restartall.addArgument(["-f", "--format"], {
+  choices: ["text", "json"],
+  defaultValue: "text",
+});
+
+var sc_check = sp.addParser("check", {
+  description: "Check the status of a process",
+});
+sc_check.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_check.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_check.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_check.addArgument(["-f", "--format"], {
+  choices: ["text", "json"],
+  defaultValue: "text",
+});
+
+var sc_list = sp.addParser("list", {
+  description: "List all processes",
+});
+sc_list.addArgument(["-H", "--host"], {defaultValue: process.env.JESUS_HOST});
+sc_list.addArgument(["-p", "--port"], {defaultValue: process.env.JESUS_PORT});
+sc_list.addArgument(["-s", "--socket"], {defaultValue: process.env.JESUS_SOCKET});
+sc_list.addArgument(["-f", "--format"], {
+  choices: ["text", "json"],
+  defaultValue: "text",
+});
+
+var args = ap.parseArgs();
+
+switch (args.action) {
+  case "listen": action_listen(args); break;
+  case "daemon": action_daemon(args); break;
+  case "start": action_start(args); break;
+  case "stop": action_stop(args); break;
+  case "stopall": action_stopAll(args); break;
+  case "restart": action_restart(args); break;
+  case "restartall": action_restartAll(args); break;
+  case "check": action_check(args); break;
+  case "list": action_list(args); break;
 }

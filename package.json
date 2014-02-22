@@ -12,7 +12,9 @@
     "asciitable": "~0.0.4",
     "vague-time": "~0.5.0",
     "leg": "~1.0.0",
-    "parstack": "0.0.1"
+    "parstack": "0.0.1",
+    "argparse": "~0.1.15",
+    "proquint-random-id": "0.0.2"
   },
   "devDependencies": {},
   "repository": {
