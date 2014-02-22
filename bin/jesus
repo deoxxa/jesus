@@ -255,15 +255,6 @@ var action_list = function action_list(argv) {
   });
 };
 
-var action_fuck = function action_fuck(argv) {
-  console.log("");
-  console.log("jesusabdullah uses JESUS FUCK!");
-  console.log("It was SUPER EFFECTIVE!");
-  console.log("");
-  console.log("You get 472¥ for winning!");
-  console.log("");
-};
-
 var argv = process.argv.slice(2);
 
 var action = (argv.shift() || "help").toLowerCase();
