@@ -103,7 +103,7 @@ Optional arguments:
 ### start
 
 ```
-usage: jesus start [-h] [-H HOST] [-p PORT] [-s SOCKET] [-n NAME]
+usage: jesus start [-h] [-H HOST] [-p PORT] [-s SOCKET] [-n NAME] [-e ENV]
                    [-f {text,json}]
                    ...
 
@@ -120,6 +120,7 @@ Optional arguments:
                         Unix socket where server for jesus to connect to is
                         listening (only used if host/port are not)
   -n NAME, --name NAME
+  -e ENV, --env ENV     Environment variables (specified like NAME=VALUE)
   -f {text,json}, --format {text,json}
 ```
 
