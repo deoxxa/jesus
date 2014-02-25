@@ -180,9 +180,18 @@ var action_daemon = function action_daemon(args) {
 };
 
 var action_start = function action_start(args) {
+  var env = (args.env || []).reduce(function(i, v) {
+    var bits = v.match(/^(.+?)(?:=(.+))?/);
+
+    i[bits[1]] = bits[2] || '';
+
+    return i;
+  }, {});
+
   jesus.connect(args.port || args.socket, args.host).on("error", dump_local_error).callRemote("start", args.command, {
     id: args.name,
     cwd: process.cwd(),
+    env: env,
   }, function(err, info) {
     if (err) {
       dump_error(err);
@@ -371,6 +380,10 @@ sc_start.addArgument(["-s", "--socket"], {
 });
 sc_start.addArgument(["-n", "--name"], {
   defaultValue: (function() { return randomId(4); })(),
+});
+sc_start.addArgument(["-e", "--env"], {
+  action: "append",
+  help: "Environment variables (specified like NAME=VALUE)",
 });
 sc_start.addArgument(["-f", "--format"], {
   defaultValue: process.env.JESUS_FORMAT || "text",
